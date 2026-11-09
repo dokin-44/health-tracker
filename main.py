@@ -54,6 +54,7 @@ def show_by_exercise():
     for r in found:
         print(r["date"], r["weight"], "kg",
               r["reps"], "회", r["sets"], "세트")
-
+    best = max(found, key=lambda r: r["weight"])
+    print("최고 기록:", best["weight"], "kg,", best["date"])
         
 main()
