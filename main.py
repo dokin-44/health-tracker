@@ -42,4 +42,16 @@ def main():
             print("잘못된 입력입니다")
 
 
+
+def show_by_exercise():
+    name = input("종목: ")
+    found = [r for r in records if r["exercise"] == name]
+    if not found:
+        print("기록 없음")
+        return
+    for r in found:
+        print(r["date"], r["weight"], "kg",
+              r["reps"], "회", r["sets"], "세트")
+
+        
 main()
