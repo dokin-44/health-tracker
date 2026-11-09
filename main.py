@@ -29,12 +29,14 @@ def show_records():
 
 def main():
     while True:
-        print("1. 기록 추가  2. 기록 보기  0. 종료")
+        print("1. 기록 추가  2. 기록 보기  3. 종목별 조회  0. 종료")
         choice = input("선택: ")
         if choice == "1":
             add_record()
         elif choice == "2":
             show_records()
+        elif choice == "3":
+            show_by_exercise()
         elif choice == "0":
             print("종료합니다")
             break
