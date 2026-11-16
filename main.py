@@ -1,6 +1,7 @@
 from datetime import date
 import json
 from pathlib import Path
+from weekly_summary import show_weekly_summary
 
 RECORDS_FILE = Path(__file__).with_name("records.json")
 records = []
