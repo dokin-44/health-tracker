@@ -4,6 +4,8 @@
     주간요약:황선후
 
 ## 운동 기록 저장
+- Windows: `python main.py`
+- macOS / Linux: `python3 main.py`
 
 `python3 main.py`로 실행한 후 `1. 기록 추가`에서 종목, 무게, 횟수, 세트를 입력합니다.
 입력한 기록은 `main.py`와 같은 폴더의 `records.json`에 자동 저장됩니다.
