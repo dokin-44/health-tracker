@@ -88,7 +88,8 @@ def main():
         print("\n===== Health Tracker =====")
         print("1. 기록 추가")
         print("2. 기록 보기")
-        print("3. 주간 요약")
+        print("3. 종목별 조회")
+        print("4. 주간 요약")
         print("0. 종료")
 
         choice = input("선택: ")
@@ -98,12 +99,30 @@ def main():
         elif choice == "2":
             show_records()
         elif choice == "3":
+            show_by_exercise()
+        elif choice == "4":
             show_weekly_summary(records)
         elif choice == "0":
             print("종료합니다.")
             break
         else:
             print("잘못된 입력입니다.")
+
+
+
+
+def show_by_exercise():
+    name = input("종목: ")
+    found = [r for r in records if r["exercise"] == name]
+    if not found:
+        print("기록 없음")
+        return
+    for r in found:
+        print(r["date"], r["weight"], "kg",
+              r["reps"], "회", r["sets"], "세트")
+    best = max(found, key=lambda r: r["weight"])
+    print("최고 기록:", best["weight"], "kg,", best["date"])
+        
 
 
 if __name__ == "__main__":
