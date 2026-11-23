@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>헬스 루틴 기록 - 기록 입력</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>운동 기록 입력</h1>
+  <p class="sub">입력한 기록은 이 브라우저에 자동 저장됩니다.</p>
+
+  <form class="card" id="form" autocomplete="off">
+    <label for="exercise">종목</label>
+    <input id="exercise" list="names" placeholder="예: 스쿼트" required>
+    <datalist id="names"></datalist>
+
+    <div class="row">
+      <div>
+        <label for="weight">무게(kg)</label>
+        <input id="weight" type="number" inputmode="decimal" min="0" step="0.5" required>
+      </div>
+      <div>
+        <label for="reps">횟수</label>
+        <input id="reps" type="number" inputmode="numeric" min="1" step="1" required>
+      </div>
+      <div>
+        <label for="sets">세트</label>
+        <input id="sets" type="number" inputmode="numeric" min="1" step="1" required>
+      </div>
+    </div>
+
+    <button class="btn block" type="submit">기록 추가</button>
+    <p class="msg" id="msg"></p>
+  </form>
+
+  <div class="card">
+    <h2>오늘 입력한 기록</h2>
+    <div id="todayList"></div>
+  </div>
+</main>
+<nav id="nav"></nav>
+
+<script src="storage.js"></script>
+<script src="nav.js"></script>
+<script>
+  // 기록 입력·저장 담당
+  renderNav("add");
+
+  const form = document.getElementById("form");
+  const msg = document.getElementById("msg");
+
+  function showMsg(text, ok) {
+    msg.textContent = text;
+    msg.className = "msg " + (ok ? "ok" : "err");
+  }
+
+  function renderNames() {
+    const list = document.getElementById("names");
+    list.replaceChildren();
+    [...new Set(loadRecords().map((r) => r.exercise))].forEach((n) => {
+      const opt = document.createElement("option");
+      opt.value = n;
+      list.appendChild(opt);
+    });
+  }
+
+  function renderToday() {
+    const box = document.getElementById("todayList");
+    box.replaceChildren();
+    const today = dateString();
+    const recs = loadRecords().filter((r) => r.date === today);
+    if (!recs.length) {
+      box.appendChild(el("div", "오늘 입력한 기록이 없습니다", "empty"));
+      return;
+    }
+    const table = el("table");
+    const head = el("tr");
+    ["종목", "무게", "횟수×세트"].forEach((t, i) => head.appendChild(el("th", t, i >= 1 ? "num" : "")));
+    table.appendChild(head);
+    recs.forEach((r) => {
+      const tr = el("tr");
+      tr.appendChild(el("td", r.exercise));
+      tr.appendChild(el("td", fmtNum(r.weight) + "kg", "num"));
+      tr.appendChild(el("td", r.reps + "×" + r.sets, "num"));
+      table.appendChild(tr);
+    });
+    box.appendChild(table);
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const exercise = document.getElementById("exercise").value.trim();
+    const weight = parseFloat(document.getElementById("weight").value);
+    const reps = parseInt(document.getElementById("reps").value, 10);
+    const sets = parseInt(document.getElementById("sets").value, 10);
+
+    if (!exercise) return showMsg("종목을 입력해 주세요", false);
+    if (!(weight >= 0)) return showMsg("무게는 0 이상의 숫자로 입력해 주세요", false);
+    if (!(reps >= 1) || !(sets >= 1)) return showMsg("횟수와 세트는 1 이상으로 입력해 주세요", false);
+
+    const ok = addRecord({ date: dateString(), exercise, weight, reps, sets });
+    if (!ok) return showMsg("저장에 실패했습니다. 브라우저 저장소를 확인해 주세요", false);
+
+    showMsg("기록 완료", true);
+    document.getElementById("weight").value = "";
+    document.getElementById("reps").value = "";
+    document.getElementById("sets").value = "";
+    document.getElementById("exercise").focus();
+    renderNames();
+    renderToday();
+  });
+
+  renderNames();
+  renderToday();
+</script>
+</body>
+</html>
