@@ -70,20 +70,37 @@
     const box = document.getElementById("todayList");
     box.replaceChildren();
     const today = dateString();
-    const recs = loadRecords().filter((r) => r.date === today);
+    const recs = loadRecords()
+      .map((r, index) => ({ r, index }))
+      .filter((x) => x.r.date === today);
     if (!recs.length) {
       box.appendChild(el("div", "오늘 입력한 기록이 없습니다", "empty"));
       return;
     }
     const table = el("table");
     const head = el("tr");
-    ["종목", "무게", "횟수×세트"].forEach((t, i) => head.appendChild(el("th", t, i >= 1 ? "num" : "")));
+    ["종목", "무게", "횟수×세트", ""].forEach((t, i) => head.appendChild(el("th", t, i >= 1 ? "num" : "")));
     table.appendChild(head);
-    recs.forEach((r) => {
+    recs.forEach(({ r, index }) => {
       const tr = el("tr");
       tr.appendChild(el("td", r.exercise));
       tr.appendChild(el("td", fmtNum(r.weight) + "kg", "num"));
       tr.appendChild(el("td", r.reps + "×" + r.sets, "num"));
+
+      // 잘못 입력한 기록 삭제
+      const del = el("button", "삭제", "btn ghost small");
+      del.type = "button";
+      del.setAttribute("aria-label", r.exercise + " 기록 삭제");
+      del.addEventListener("click", () => {
+        if (!removeRecordAt(index)) return showMsg("삭제에 실패했습니다", false);
+        showMsg("기록을 삭제했습니다", true);
+        renderNames();
+        renderToday();
+      });
+      const cell = el("td", undefined, "num");
+      cell.appendChild(del);
+      tr.appendChild(cell);
+
       table.appendChild(tr);
     });
     box.appendChild(table);

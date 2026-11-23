@@ -85,7 +85,13 @@ function findBest(records) {
 // ====================================================================
 
 // --- 기록 삭제 (윤성) ---
-// (구현 예정)
+// 기록 한 건 삭제 (저장된 배열에서의 위치로 지정)
+function removeRecordAt(index) {
+  const all = loadRecords();
+  if (index < 0 || index >= all.length) return false;
+  all.splice(index, 1);
+  return saveRecords(all);
+}
 
 // --- 주간 목표 (선후) ---
 // (구현 예정)
