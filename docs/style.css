@@ -149,7 +149,11 @@ tr.best td { font-weight: 700; }
    ==================================================================== */
 
 /* --- 무게 추이 그래프 (건우) --- */
-/* (구현 예정) */
+.chart { width: 100%; height: auto; display: block; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .tick { fill: var(--muted); font-size: 10px; }
+.chart .line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; }
+.chart .dot { fill: var(--accent); }
 
 /* --- 주간 목표 (선후) --- */
 /* (구현 예정) */
