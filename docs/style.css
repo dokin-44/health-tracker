@@ -168,7 +168,8 @@ tr.best td { font-weight: 700; }
 /* (구현 예정) */
 
 /* --- 기록 백업 (윤성) --- */
-/* (구현 예정) */
+.backup input[type="file"] { display: none; }
+.backup .tools { margin-top: 6px; }
 
 /* --- 빠른 입력 (윤성) --- */
 /* (구현 예정) */
