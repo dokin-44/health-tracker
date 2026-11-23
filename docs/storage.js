@@ -120,7 +120,23 @@ function saveGoal(n) {
 // (구현 예정)
 
 // --- 달력과 연속 운동일 (선후) ---
-// (구현 예정)
+// 기록이 있는 날짜 집합
+function recordDays(records) {
+  return new Set(records.map((r) => r.date));
+}
+
+// 연속 운동일 수. 오늘 기록이 없어도 어제까지 이어졌다면 이어진 것으로 본다 (하루가 끝나기 전에는 끊긴 게 아니므로)
+function calcStreak(records, base = new Date()) {
+  const days = recordDays(records);
+  const d = new Date(base.getFullYear(), base.getMonth(), base.getDate());
+  if (!days.has(dateString(d))) d.setDate(d.getDate() - 1);
+  let n = 0;
+  while (days.has(dateString(d))) {
+    n += 1;
+    d.setDate(d.getDate() - 1);
+  }
+  return n;
+}
 
 // --- 기록 백업 (윤성) ---
 // (구현 예정)

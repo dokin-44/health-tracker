@@ -17,6 +17,20 @@
     <div class="stat"><b id="weekSets">0</b><span>이번 주 세트</span></div>
   </div>
 
+  <div class="stats two">
+    <div class="stat"><b id="streak">0</b><span>연속 운동일</span></div>
+    <div class="stat"><b id="monthDays">0</b><span>이번 달 운동일</span></div>
+  </div>
+
+  <div class="card">
+    <div class="cal-head">
+      <button class="btn ghost small" id="calPrev" type="button">◀ 이전</button>
+      <strong id="calTitle"></strong>
+      <button class="btn ghost small" id="calNext" type="button">다음 ▶</button>
+    </div>
+    <div class="cal" id="cal"></div>
+  </div>
+
   <div class="card">
     <h2>최근 기록</h2>
     <div id="recent"></div>
@@ -50,6 +64,8 @@
     document.getElementById("todayCount").textContent = records.filter((r) => r.date === today).length;
     document.getElementById("weekDays").textContent = new Set(weekRecs.map((r) => r.date)).size;
     document.getElementById("weekSets").textContent = weekRecs.reduce((s, r) => s + Number(r.sets), 0);
+    document.getElementById("streak").textContent = calcStreak(records);
+    renderCalendar(records);
 
     const box = document.getElementById("recent");
     box.replaceChildren();
@@ -71,6 +87,39 @@
     });
     box.appendChild(table);
   }
+
+  // 월간 달력: 운동한 날을 색으로 표시한다
+  let calOffset = 0; // 0이면 이번 달, -1이면 지난달
+  function renderCalendar(records) {
+    const now = new Date();
+    const first = new Date(now.getFullYear(), now.getMonth() + calOffset, 1);
+    const year = first.getFullYear();
+    const month = first.getMonth();
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    const days = recordDays(records);
+    const todayKey = dateString();
+
+    document.getElementById("calTitle").textContent = year + "년 " + (month + 1) + "월";
+    document.getElementById("calNext").disabled = calOffset >= 0;
+
+    const prefix = year + "-" + String(month + 1).padStart(2, "0") + "-";
+    let count = 0;
+    const grid = document.getElementById("cal");
+    grid.replaceChildren();
+    ["월", "화", "수", "목", "금", "토", "일"].forEach((t) => grid.appendChild(el("div", t, "dow")));
+    const blanks = (first.getDay() + 6) % 7; // 월요일 시작
+    for (let i = 0; i < blanks; i++) grid.appendChild(el("div"));
+    for (let d = 1; d <= lastDay; d++) {
+      const key = prefix + String(d).padStart(2, "0");
+      const done = days.has(key);
+      if (done) count += 1;
+      grid.appendChild(el("div", String(d), "day" + (done ? " done" : "") + (key === todayKey ? " today" : "")));
+    }
+    document.getElementById("monthDays").textContent = count;
+  }
+
+  document.getElementById("calPrev").addEventListener("click", () => { calOffset -= 1; renderHome(); });
+  document.getElementById("calNext").addEventListener("click", () => { if (calOffset < 0) { calOffset += 1; renderHome(); } });
 
   document.getElementById("sampleBtn").addEventListener("click", () => {
     // 발표 시연용 예시 데이터 (실제 운동 기록이 아님)
