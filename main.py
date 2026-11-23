@@ -1,6 +1,7 @@
 from datetime import date
 import json
 from pathlib import Path
+from weekly_summary import show_weekly_summary
 
 RECORDS_FILE = Path(__file__).with_name("records.json")
 records = []
@@ -82,20 +83,30 @@ def main():
     except (OSError, ValueError) as error:
         print(f"기록 불러오기 실패: {error}")
         return
+
     while True:
-        print("1. 기록 추가  2. 기록 보기  3. 종목별 조회  0. 종료")
+        print("\n===== Health Tracker =====")
+        print("1. 기록 추가")
+        print("2. 기록 보기")
+        print("3. 종목별 조회")
+        print("4. 주간 요약")
+        print("0. 종료")
+
         choice = input("선택: ")
+
         if choice == "1":
             add_record()
         elif choice == "2":
             show_records()
         elif choice == "3":
             show_by_exercise()
+        elif choice == "4":
+            show_weekly_summary(records)
         elif choice == "0":
-            print("종료합니다")
+            print("종료합니다.")
             break
         else:
-            print("잘못된 입력입니다")
+            print("잘못된 입력입니다.")
 
 
 
