@@ -117,7 +117,13 @@ function saveGoal(n) {
 }
 
 // --- 예상 1RM (건우) ---
-// (구현 예정)
+// 예상 1RM (Epley 공식: 무게 x (1 + 횟수/30)). 실제 측정값이 아니라 추정치다.
+function estimate1RM(weight, reps) {
+  const w = Number(weight);
+  const r = Number(reps);
+  if (!(w > 0) || !(r >= 1)) return 0;
+  return r === 1 ? w : w * (1 + r / 30);
+}
 
 // --- 달력과 연속 운동일 (선후) ---
 // 기록이 있는 날짜 집합

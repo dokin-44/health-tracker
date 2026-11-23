@@ -162,7 +162,7 @@ tr.best td { font-weight: 700; }
 #progressBar { height: 100%; width: 0; background: var(--accent); }
 
 /* --- 예상 1RM (건우) --- */
-/* (구현 예정) */
+.best-card .rm { margin-top: 6px; font-size: 0.9rem; color: var(--muted); }
 
 /* --- 달력과 연속 운동일 (선후) --- */
 .stats.two { grid-template-columns: repeat(2, 1fr); }
