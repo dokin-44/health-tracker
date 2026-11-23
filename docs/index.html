@@ -9,14 +9,97 @@
 <body>
 <main>
   <h1>헬스 루틴 기록</h1>
-  <p class="sub">홈 화면은 준비 중입니다. 아래 탭에서 다른 화면을 사용할 수 있습니다.</p>
+  <p class="sub" id="today"></p>
+
+  <div class="stats">
+    <div class="stat"><b id="todayCount">0</b><span>오늘 기록</span></div>
+    <div class="stat"><b id="weekDays">0</b><span>이번 주 운동일</span></div>
+    <div class="stat"><b id="weekSets">0</b><span>이번 주 세트</span></div>
+  </div>
+
+  <div class="card">
+    <h2>최근 기록</h2>
+    <div id="recent"></div>
+  </div>
+
+  <div class="card">
+    <h2>데이터 관리</h2>
+    <p class="sub">기록은 이 브라우저에만 저장됩니다.</p>
+    <div class="tools">
+      <button class="btn ghost small" id="sampleBtn" type="button">예시 데이터 넣기</button>
+      <button class="btn ghost small" id="resetBtn" type="button">전체 초기화</button>
+    </div>
+    <p class="msg" id="msg"></p>
+  </div>
 </main>
 <nav id="nav"></nav>
 
+<script src="storage.js"></script>
 <script src="nav.js"></script>
 <script>
-  // 홈 화면 자리 표시용 파일. 홈 화면 담당이 이 파일을 실제 화면으로 교체한다.
+  // 홈 화면 담당: 오늘/이번 주 요약과 최근 기록
   renderNav("home");
+
+  function renderHome() {
+    const records = loadRecords();
+    const today = dateString();
+    const week = getWeekRange();
+    const weekRecs = records.filter((r) => r.date >= week.start && r.date <= week.end);
+
+    document.getElementById("today").textContent = today;
+    document.getElementById("todayCount").textContent = records.filter((r) => r.date === today).length;
+    document.getElementById("weekDays").textContent = new Set(weekRecs.map((r) => r.date)).size;
+    document.getElementById("weekSets").textContent = weekRecs.reduce((s, r) => s + Number(r.sets), 0);
+
+    const box = document.getElementById("recent");
+    box.replaceChildren();
+    if (!records.length) {
+      box.appendChild(el("div", "기록이 없습니다. 아래 '기록' 탭에서 첫 운동을 입력해 보세요.", "empty"));
+      return;
+    }
+    const table = el("table");
+    const head = el("tr");
+    ["날짜", "종목", "무게", "횟수×세트"].forEach((t, i) => head.appendChild(el("th", t, i >= 2 ? "num" : "")));
+    table.appendChild(head);
+    records.slice(-5).reverse().forEach((r) => {
+      const tr = el("tr");
+      tr.appendChild(el("td", r.date));
+      tr.appendChild(el("td", r.exercise));
+      tr.appendChild(el("td", fmtNum(r.weight) + "kg", "num"));
+      tr.appendChild(el("td", r.reps + "×" + r.sets, "num"));
+      table.appendChild(tr);
+    });
+    box.appendChild(table);
+  }
+
+  document.getElementById("sampleBtn").addEventListener("click", () => {
+    // 발표 시연용 예시 데이터 (실제 운동 기록이 아님)
+    const samples = [
+      [0, "스쿼트", 60, 10, 3], [0, "벤치프레스", 40, 10, 3],
+      [2, "스쿼트", 70, 8, 3], [3, "데드리프트", 80, 5, 3],
+      [5, "벤치프레스", 45, 8, 3],
+    ];
+    const all = loadRecords();
+    samples.forEach(([ago, exercise, weight, reps, sets]) => {
+      const d = new Date();
+      d.setDate(d.getDate() - ago);
+      all.push({ date: dateString(d), exercise, weight, reps, sets });
+    });
+    const ok = saveRecords(all);
+    document.getElementById("msg").textContent = ok ? "예시 데이터를 추가했습니다" : "저장에 실패했습니다";
+    document.getElementById("msg").className = "msg " + (ok ? "ok" : "err");
+    renderHome();
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    if (!confirm("저장된 기록을 모두 삭제할까요?")) return;
+    clearRecords();
+    document.getElementById("msg").textContent = "모든 기록을 삭제했습니다";
+    document.getElementById("msg").className = "msg ok";
+    renderHome();
+  });
+
+  renderHome();
 </script>
 </body>
 </html>
