@@ -159,7 +159,7 @@ tr.best td { font-weight: 700; }
 /* (구현 예정) */
 
 /* --- 예상 1RM (건우) --- */
-/* (구현 예정) */
+.best-card .rm { margin-top: 6px; font-size: 0.9rem; color: var(--muted); }
 
 /* --- 달력과 연속 운동일 (선후) --- */
 /* (구현 예정) */
