@@ -21,6 +21,7 @@
       <div class="sub">최고 기록</div>
       <div class="big" id="bestWeight">-</div>
       <div class="date" id="bestDate"></div>
+      <div class="rm" id="bestRm"></div>
     </div>
 
     <div class="card">
@@ -56,6 +57,10 @@
     const best = findBest(found);
     document.getElementById("bestWeight").textContent = fmtNum(best.weight) + " kg";
     document.getElementById("bestDate").textContent = best.date;
+    // 예상 1RM은 기록 중 가장 높은 추정값 (Epley 공식, 추정치)
+    const topRm = found.reduce((m, r) => (estimate1RM(r.weight, r.reps) > estimate1RM(m.weight, m.reps) ? r : m), found[0]);
+    const rm = estimate1RM(topRm.weight, topRm.reps);
+    document.getElementById("bestRm").textContent = rm ? "예상 1RM (추정) " + fmtNum(rm) + " kg" : "";
     renderChart(found);
 
     const box = document.getElementById("list");
