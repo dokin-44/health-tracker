@@ -24,6 +24,18 @@
   </div>
 
   <div class="card">
+    <h2>주간 목표</h2>
+    <div class="goalrow">
+      <input id="goal" type="number" inputmode="numeric" min="1" step="1" placeholder="목표 세트 수" aria-label="주간 목표 세트 수">
+      <button class="btn small" id="saveGoal" type="button">저장</button>
+    </div>
+    <div class="progress" id="progress" role="progressbar" aria-label="주간 목표 달성률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div id="progressBar"></div>
+    </div>
+    <p class="sub" id="goalText"></p>
+  </div>
+
+  <div class="card">
     <h2>요일별 세트 수</h2>
     <div class="bars" id="bars"></div>
   </div>
@@ -56,7 +68,9 @@
     const volumeOf = (r) => Number(r.weight) * Number(r.reps) * Number(r.sets);
 
     document.getElementById("days").textContent = new Set(recs.map((r) => r.date)).size;
-    document.getElementById("sets").textContent = recs.reduce((s, r) => s + Number(r.sets), 0);
+    const totalSets = recs.reduce((s, r) => s + Number(r.sets), 0);
+    document.getElementById("sets").textContent = totalSets;
+    renderGoal(totalSets);
     document.getElementById("volume").textContent = Math.round(recs.reduce((s, r) => s + volumeOf(r), 0)).toLocaleString("ko-KR");
 
     // 요일별 막대
@@ -108,6 +122,34 @@
     });
     box.appendChild(table);
   }
+
+  // 주간 목표 세트 대비 달성률
+  function renderGoal(total) {
+    const goal = loadGoal();
+    const input = document.getElementById("goal");
+    if (document.activeElement !== input) input.value = goal || "";
+    const bar = document.getElementById("progressBar");
+    const text = document.getElementById("goalText");
+    const track = document.getElementById("progress");
+    if (!goal) {
+      bar.style.width = "0%";
+      track.setAttribute("aria-valuenow", "0");
+      text.textContent = "목표 세트 수를 정하면 달성률이 표시됩니다";
+      return;
+    }
+    const pct = Math.min(100, Math.round((total / goal) * 100));
+    bar.style.width = pct + "%";
+    track.setAttribute("aria-valuenow", String(pct));
+    text.textContent = total >= goal
+      ? "목표 달성: " + total + " / " + goal + " 세트 (" + pct + "%)"
+      : total + " / " + goal + " 세트 (" + pct + "%), " + (goal - total) + "세트 남음";
+  }
+
+  document.getElementById("saveGoal").addEventListener("click", () => {
+    const n = parseInt(document.getElementById("goal").value, 10);
+    saveGoal(n >= 1 ? n : 0); // 비우면 목표를 지운다
+    render();
+  });
 
   document.getElementById("prev").addEventListener("click", () => { offset -= 1; render(); });
   document.getElementById("next").addEventListener("click", () => { if (offset < 0) { offset += 1; render(); } });
