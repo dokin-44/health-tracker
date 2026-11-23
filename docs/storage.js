@@ -94,7 +94,27 @@ function removeRecordAt(index) {
 }
 
 // --- 주간 목표 (선후) ---
-// (구현 예정)
+// 주간 목표 세트 수 (0이면 목표 없음). 기록과 별도 키에 저장한다.
+const GOAL_KEY = "weeklyGoalSets";
+
+function loadGoal() {
+  try {
+    const n = parseInt(localStorage.getItem(GOAL_KEY), 10);
+    return n >= 1 ? n : 0;
+  } catch (e) {
+    return 0;
+  }
+}
+
+function saveGoal(n) {
+  try {
+    if (n >= 1) localStorage.setItem(GOAL_KEY, String(n));
+    else localStorage.removeItem(GOAL_KEY);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 // --- 예상 1RM (건우) ---
 // (구현 예정)

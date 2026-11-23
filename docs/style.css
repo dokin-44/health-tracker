@@ -156,7 +156,10 @@ tr.best td { font-weight: 700; }
 .chart .dot { fill: var(--accent); }
 
 /* --- 주간 목표 (선후) --- */
-/* (구현 예정) */
+.goalrow { display: flex; gap: 8px; }
+.goalrow input { flex: 1; min-width: 0; }
+.progress { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 12px 0 8px; }
+#progressBar { height: 100%; width: 0; background: var(--accent); }
 
 /* --- 예상 1RM (건우) --- */
 /* (구현 예정) */
