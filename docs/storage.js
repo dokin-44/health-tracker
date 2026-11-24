@@ -145,13 +145,67 @@ function calcStreak(records, base = new Date()) {
 }
 
 // --- 기록 백업 (윤성) ---
-// (구현 예정)
+// 가져온 기록이 올바른 형식인지 검사
+function isValidRecord(r) {
+  return !!r && typeof r === "object"
+    && /^\d{4}-\d{2}-\d{2}$/.test(r.date)
+    && typeof r.exercise === "string" && r.exercise.trim() !== ""
+    && Number(r.weight) >= 0 && typeof r.weight === "number"
+    && Number.isInteger(r.reps) && r.reps >= 1
+    && Number.isInteger(r.sets) && r.sets >= 1;
+}
+
+// 기록 전체를 JSON 문자열로 (내보내기)
+function exportRecordsJSON() {
+  return JSON.stringify(loadRecords(), null, 2);
+}
+
+// JSON 문자열의 기록을 현재 기록에 합친다. 완전히 같은 기록은 건너뛴다.
+// 반환: { ok, added, skipped, invalid, error }
+function importRecordsJSON(text) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    return { ok: false, error: "JSON 형식이 아닙니다" };
+  }
+  if (!Array.isArray(data)) return { ok: false, error: "기록 목록(배열)이 아닙니다" };
+  const all = loadRecords();
+  const key = (r) => [r.date, r.exercise, r.weight, r.reps, r.sets].join("|");
+  const seen = new Set(all.map(key));
+  let added = 0, skipped = 0, invalid = 0;
+  data.forEach((r) => {
+    if (!isValidRecord(r)) { invalid += 1; return; }
+    const rec = { date: r.date, exercise: r.exercise.trim(), weight: r.weight, reps: r.reps, sets: r.sets };
+    if (seen.has(key(rec))) { skipped += 1; return; }
+    seen.add(key(rec));
+    all.push(rec);
+    added += 1;
+  });
+  if (added && !saveRecords(all)) return { ok: false, error: "저장에 실패했습니다" };
+  return { ok: true, added, skipped, invalid };
+}
 
 // --- 신기록 알림 (윤성) ---
 // (구현 예정)
 
 // --- 빠른 입력 (윤성) ---
-// (구현 예정)
+// 최근에 한 종목 이름 (최근 것부터, 중복 없이, 최대 n개)
+function recentExercises(records, n = 6) {
+  const out = [];
+  for (let i = records.length - 1; i >= 0 && out.length < n; i--) {
+    if (!out.includes(records[i].exercise)) out.push(records[i].exercise);
+  }
+  return out;
+}
+
+// 그 종목의 가장 마지막 기록 (없으면 undefined)
+function lastRecordOf(records, exercise) {
+  for (let i = records.length - 1; i >= 0; i--) {
+    if (records[i].exercise === exercise) return records[i];
+  }
+  return undefined;
+}
 
 // --- 지난주 대비 (선후) ---
 // (구현 예정)
