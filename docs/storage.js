@@ -190,7 +190,22 @@ function importRecordsJSON(text) {
 // (구현 예정)
 
 // --- 빠른 입력 (윤성) ---
-// (구현 예정)
+// 최근에 한 종목 이름 (최근 것부터, 중복 없이, 최대 n개)
+function recentExercises(records, n = 6) {
+  const out = [];
+  for (let i = records.length - 1; i >= 0 && out.length < n; i--) {
+    if (!out.includes(records[i].exercise)) out.push(records[i].exercise);
+  }
+  return out;
+}
+
+// 그 종목의 가장 마지막 기록 (없으면 undefined)
+function lastRecordOf(records, exercise) {
+  for (let i = records.length - 1; i >= 0; i--) {
+    if (records[i].exercise === exercise) return records[i];
+  }
+  return undefined;
+}
 
 // --- 지난주 대비 (선후) ---
 // (구현 예정)

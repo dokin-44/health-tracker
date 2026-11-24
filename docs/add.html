@@ -12,6 +12,11 @@
   <p class="sub">입력한 기록은 이 브라우저에 자동 저장됩니다.</p>
 
   <form class="card" id="form" autocomplete="off">
+    <div id="chipsBox">
+      <label>최근 종목 (누르면 지난 기록으로 채워집니다)</label>
+      <div class="chips" id="chips"></div>
+    </div>
+
     <label for="exercise">종목</label>
     <input id="exercise" list="names" placeholder="예: 스쿼트" required>
     <datalist id="names"></datalist>
@@ -74,6 +79,32 @@
       const opt = document.createElement("option");
       opt.value = n;
       list.appendChild(opt);
+    });
+    renderChips();
+  }
+
+  // 최근 종목 버튼: 누르면 그 종목의 지난 기록으로 입력칸을 채운다
+  function renderChips() {
+    const records = loadRecords();
+    const box = document.getElementById("chips");
+    box.replaceChildren();
+    const names = recentExercises(records);
+    document.getElementById("chipsBox").hidden = !names.length;
+    names.forEach((name) => {
+      const btn = el("button", name, "chip");
+      btn.type = "button";
+      btn.addEventListener("click", () => {
+        const last = lastRecordOf(loadRecords(), name);
+        if (!last) return;
+        document.getElementById("exercise").value = last.exercise;
+        document.getElementById("weight").value = last.weight;
+        document.getElementById("reps").value = last.reps;
+        document.getElementById("sets").value = last.sets;
+        const w = document.getElementById("weight");
+        w.focus();
+        w.select();
+      });
+      box.appendChild(btn);
     });
   }
 
