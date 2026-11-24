@@ -187,7 +187,24 @@ function importRecordsJSON(text) {
 }
 
 // --- 신기록 알림 (윤성) ---
-// (구현 예정)
+// 기록 한 건의 볼륨 (무게 x 횟수 x 세트)
+function recordVolume(r) {
+  return Number(r.weight) * Number(r.reps) * Number(r.sets);
+}
+
+// 신기록 판정: 같은 종목의 이전 기록(prev)과 비교한다.
+// 이전 기록이 없으면 첫 기록이라 신기록으로 치지 않는다.
+// 반환: { first: boolean, prs: [{ label, before, after, unit }] }
+function checkPersonalRecords(prev, rec) {
+  if (!prev.length) return { first: true, prs: [] };
+  const best = (fn) => prev.reduce((m, r) => Math.max(m, fn(r)), 0);
+  const items = [
+    { label: "최고 무게", after: Number(rec.weight), before: best((r) => Number(r.weight)), unit: "kg" },
+    { label: "예상 1RM", after: estimate1RM(rec.weight, rec.reps), before: best((r) => estimate1RM(r.weight, r.reps)), unit: "kg" },
+    { label: "볼륨", after: recordVolume(rec), before: best(recordVolume), unit: "kg" },
+  ];
+  return { first: false, prs: items.filter((x) => x.after > 0 && x.after > x.before + 1e-9) };
+}
 
 // --- 빠른 입력 (윤성) ---
 // 최근에 한 종목 이름 (최근 것부터, 중복 없이, 최대 n개)
