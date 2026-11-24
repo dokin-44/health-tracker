@@ -185,7 +185,9 @@ tr.best td { font-weight: 700; }
 .chip:hover { background: var(--accent-weak); }
 
 /* --- 신기록 알림 (윤성) --- */
-/* (구현 예정) */
+.pr { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--accent-weak); font-size: 0.9rem; }
+.pr b { display: block; margin-bottom: 2px; }
+.pr.first { color: var(--muted); }
 
 /* --- 홈 구성 개선 (건우) --- */
 /* (구현 예정) */
