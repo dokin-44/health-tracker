@@ -225,4 +225,12 @@ function lastRecordOf(records, exercise) {
 }
 
 // --- 지난주 대비 (선후) ---
-// (구현 예정)
+// 한 주(getWeekRange 결과)의 합계: 운동한 날, 세트, 볼륨
+function weekTotals(records, week) {
+  const recs = records.filter((r) => r.date >= week.start && r.date <= week.end);
+  return {
+    days: new Set(recs.map((r) => r.date)).size,
+    sets: recs.reduce((s, r) => s + Number(r.sets), 0),
+    volume: recs.reduce((s, r) => s + recordVolume(r), 0),
+  };
+}
