@@ -18,9 +18,9 @@
   </div>
 
   <div class="stats">
-    <div class="stat"><b id="days">0</b><span>운동한 날</span></div>
-    <div class="stat"><b id="sets">0</b><span>총 세트</span></div>
-    <div class="stat"><b id="volume">0</b><span>총 볼륨(kg)</span></div>
+    <div class="stat"><b id="days">0</b><span>운동한 날</span><small class="delta" id="dDays"></small></div>
+    <div class="stat"><b id="sets">0</b><span>총 세트</span><small class="delta" id="dSets"></small></div>
+    <div class="stat"><b id="volume">0</b><span>총 볼륨(kg)</span><small class="delta" id="dVolume"></small></div>
   </div>
 
   <div class="card">
@@ -71,6 +71,7 @@
     const totalSets = recs.reduce((s, r) => s + Number(r.sets), 0);
     document.getElementById("sets").textContent = totalSets;
     renderGoal(totalSets);
+    renderDeltas(week, base);
     document.getElementById("volume").textContent = Math.round(recs.reduce((s, r) => s + volumeOf(r), 0)).toLocaleString("ko-KR");
 
     // 요일별 막대
@@ -121,6 +122,36 @@
       table.appendChild(tr);
     });
     box.appendChild(table);
+  }
+
+  // 바로 앞 주와 비교해 증감을 표시한다
+  function setDelta(id, cur, prev, unit) {
+    const node = document.getElementById(id);
+    node.className = "delta";
+    if (!prev) {
+      node.textContent = cur ? "비교할 전주 기록 없음" : "";
+      return;
+    }
+    if (unit === "일") {
+      const diff = cur - prev;
+      node.textContent = diff === 0 ? "전주와 같음" : (diff > 0 ? "▲ " : "▼ ") + Math.abs(diff) + "일";
+      if (diff > 0) node.classList.add("up");
+      return;
+    }
+    const pct = Math.round(((cur - prev) / prev) * 100);
+    node.textContent = pct === 0 ? "전주와 같음" : (pct > 0 ? "▲ " : "▼ ") + Math.abs(pct) + "%";
+    if (pct > 0) node.classList.add("up");
+  }
+
+  function renderDeltas(week, base) {
+    const all = loadRecords();
+    const prevBase = new Date(base);
+    prevBase.setDate(prevBase.getDate() - 7);
+    const cur = weekTotals(all, week);
+    const prev = weekTotals(all, getWeekRange(prevBase));
+    setDelta("dDays", cur.days, prev.days, "일");
+    setDelta("dSets", cur.sets, prev.sets, "세트");
+    setDelta("dVolume", cur.volume, prev.volume, "kg");
   }
 
   // 주간 목표 세트 대비 달성률

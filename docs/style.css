@@ -199,4 +199,5 @@ a.btn { text-decoration: none; text-align: center; }
 .goal-mini a { font-size: 0.85rem; color: var(--accent); }
 
 /* --- 지난주 대비 (선후) --- */
-/* (구현 예정) */
+.stat .delta { display: block; font-size: 0.75rem; margin-top: 2px; min-height: 1.1em; color: var(--muted); }
+.stat .delta.up { color: var(--good); font-weight: 700; }
