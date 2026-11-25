@@ -11,15 +11,26 @@
   <h1>헬스 루틴 기록</h1>
   <p class="sub" id="today"></p>
 
+  <div class="card hero">
+    <h2>오늘</h2>
+    <div class="big"><b id="todayCount">0</b>건 기록 · <span id="todaySets">0</span>세트</div>
+    <div id="todayBrief"></div>
+    <a class="btn block" href="add.html">오늘 운동 기록하기</a>
+  </div>
+
   <div class="stats">
-    <div class="stat"><b id="todayCount">0</b><span>오늘 기록</span></div>
+    <div class="stat"><b id="streak">0</b><span>연속 운동일</span></div>
     <div class="stat"><b id="weekDays">0</b><span>이번 주 운동일</span></div>
     <div class="stat"><b id="weekSets">0</b><span>이번 주 세트</span></div>
   </div>
 
-  <div class="stats two">
-    <div class="stat"><b id="streak">0</b><span>연속 운동일</span></div>
-    <div class="stat"><b id="monthDays">0</b><span>이번 달 운동일</span></div>
+  <div class="card goal-mini">
+    <h2>이번 주 목표</h2>
+    <p class="sub" id="homeGoalText"></p>
+    <div class="progress" id="homeGoalTrack" role="progressbar" aria-label="주간 목표 달성률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div id="homeGoalBar" style="height:100%;width:0;background:var(--accent)"></div>
+    </div>
+    <a href="weekly.html">목표 정하기 또는 바꾸기</a>
   </div>
 
   <div class="card">
@@ -28,6 +39,7 @@
       <strong id="calTitle"></strong>
       <button class="btn ghost small" id="calNext" type="button">다음 ▶</button>
     </div>
+    <p class="sub" style="margin:0 0 8px;text-align:center">이 달 <b id="monthDays">0</b>일 운동</p>
     <div class="cal" id="cal"></div>
   </div>
 
@@ -65,6 +77,40 @@
     document.getElementById("weekDays").textContent = new Set(weekRecs.map((r) => r.date)).size;
     document.getElementById("weekSets").textContent = weekRecs.reduce((s, r) => s + Number(r.sets), 0);
     document.getElementById("streak").textContent = calcStreak(records);
+
+    // 오늘 카드: 오늘 한 기록을 맨 위에서 바로 보여준다
+    const todayRecs = records.filter((r) => r.date === today);
+    document.getElementById("todaySets").textContent = todayRecs.reduce((s, r) => s + Number(r.sets), 0);
+    const brief = document.getElementById("todayBrief");
+    brief.replaceChildren();
+    if (!todayRecs.length) {
+      brief.appendChild(el("div", "오늘 아직 기록이 없습니다", "empty"));
+    } else {
+      todayRecs.forEach((r) => {
+        const line = el("div", undefined, "line");
+        line.appendChild(el("span", r.exercise));
+        line.appendChild(el("span", fmtNum(r.weight) + "kg · " + r.reps + "×" + r.sets));
+        brief.appendChild(line);
+      });
+    }
+
+    // 이번 주 목표 달성률
+    const goal = loadGoal();
+    const weekSetTotal = weekRecs.reduce((s, r) => s + Number(r.sets), 0);
+    const gBar = document.getElementById("homeGoalBar");
+    const gText = document.getElementById("homeGoalText");
+    if (!goal) {
+      gBar.style.width = "0%";
+      document.getElementById("homeGoalTrack").setAttribute("aria-valuenow", "0");
+      gText.textContent = "아직 목표가 없습니다";
+    } else {
+      const pct = Math.min(100, Math.round((weekSetTotal / goal) * 100));
+      gBar.style.width = pct + "%";
+      document.getElementById("homeGoalTrack").setAttribute("aria-valuenow", String(pct));
+      gText.textContent = weekSetTotal >= goal
+        ? "목표 달성: " + weekSetTotal + " / " + goal + " 세트"
+        : weekSetTotal + " / " + goal + " 세트 (" + pct + "%)";
+    }
     renderCalendar(records);
 
     const box = document.getElementById("recent");
